@@ -148,7 +148,7 @@ Números).</p>
 Pacotes já fora de ordem são descartados pela própria lógica do GBN e não devem ser contabilizados como
 perdas simuladas.</p>
 
-<p>5. Compilação (Corrigir)</p>
+<h3><a>5. Compilação (Corrigir)</a></h3>
 
 | Comando                |  Função                                                                                           |                     
 | -----------------------| ------------------------------------------------------------------------------------------------- |
