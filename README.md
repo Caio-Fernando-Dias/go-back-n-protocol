@@ -150,11 +150,14 @@ perdas simuladas.</p>
 
 <h3><a>5. Compilação (Corrigir)</a></h3>
 
-| Comando                |  Função                                                                                           |                     
-| -----------------------| ------------------------------------------------------------------------------------------------- |
-|  `make clean`          | Apaga a última compilação realizada contida na pasta build                                        |
-|  `make`                | Executa a compilação do programa utilizando o g++, e o resultado vai para a pasta build           |
-|  `make run`            | Executa o programa da pasta build após a realização da compilação                                 |
+| Comando                                                                                   | Função                                                               |                     
+|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| `rm *.class`                                                                              | Apaga a última compilação realizada contida na pasta src             |
+| `rm ../arquivo_teste.txt ou rm ../recebido_texte.txt`                                     | Apaga o último arquivo de teste gerado                               |
+| `javac *.java`                                                                            | Compila o programa e o resultado vai para pasta src                 |
+| `java Receptor`                                                                           | Executa o Receptor em um terminal isolado para esperar na porta 5000 |
+| `java GeradorArquivo`                                                                     | Gera o arquivo de trasnferência                                      |
+| `java Emissor <arquivo_origem> <IP_destino>:<path_destino> <tamanho_janela> <prob_perda>` | Executa a transferência de pacote pelo Emissor                       |
 
 # Alunos
 
