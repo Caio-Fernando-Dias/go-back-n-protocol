@@ -31,3 +31,11 @@ bin/
 
 ### .class ###
 *.class
+build/
+
+### dados/testes gerados localmente ###
+data/
+
+### arquivos do Intellij ###
+.idea/
+*.iml
