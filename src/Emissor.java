@@ -47,6 +47,9 @@ public class Emissor {
             File f = new File(arquivoOrigem);
             long tamanhoArquivo = f.length();
 
+            System.out.println("A calcular o Hash MD5 do ficheiro original...");
+            System.out.println("MD5 Origem: " + GerenciadorHash.calcularMD5(arquivoOrigem));
+
             carregarArquivoParaPacotes(arquivoOrigem);
             int totalPacotes = PACOTES_EM_MEMORIA.size();
 
