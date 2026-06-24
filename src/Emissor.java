@@ -3,8 +3,6 @@ import java.io.FileInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -15,12 +13,16 @@ public class Emissor {
     private static final Logger LOGGER = Logger.getLogger(Emissor.class.getName());
 
     private static final int PORTA_DESTINO = 5000;
-    private static final List<byte[]> PACOTES_EM_MEMORIA = new ArrayList<>();
     private static final Object FSM_LOCK = new Object();
 
     private static int base = 0;
     private static int nextSeqNum = 0;
     private static Timer timer;
+
+    // Variáveis de Estado para o Ficheiro e Buffer Circular
+    private static int tamanhoJanela_N;
+    private static byte[][] bufferCircular;
+    private static FileInputStream fis;
 
     // Estatísticas
     private static int acksRecebidos = 0;
@@ -40,8 +42,7 @@ public class Emissor {
             InetAddress enderecoDestino = InetAddress.getByName(destinoParts[0]);
             String pathDestino = destinoParts[1];
 
-            // Transformado em variável local
-            int tamanhoJanela_N = Integer.parseInt(args[2]);
+            tamanhoJanela_N = Integer.parseInt(args[2]);
             double probPerda = Double.parseDouble(args[3]);
 
             File f = new File(arquivoOrigem);
@@ -50,33 +51,40 @@ public class Emissor {
             System.out.println("A calcular o Hash MD5 do ficheiro original...");
             System.out.println("MD5 Origem: " + GerenciadorHash.calcularMD5(arquivoOrigem));
 
-            carregarArquivoParaPacotes(arquivoOrigem);
-            int totalPacotes = PACOTES_EM_MEMORIA.size();
+            // 1. Inicializar a leitura dinâmica do ficheiro e o Buffer Circular
+            fis = new FileInputStream(arquivoOrigem);
+            bufferCircular = new byte[tamanhoJanela_N][];
+
+            // Cálculo seguro do número total de pacotes sem carregar os dados
+            int totalPacotes = (int) Math.ceil((double) tamanhoArquivo / Constantes.TAMANHO_MAX_DADOS);
+            if (totalPacotes == 0) totalPacotes = 1; // Garante o processamento de ficheiros vazios
 
             DatagramSocket socket = new DatagramSocket();
 
             long tempoInicio = System.currentTimeMillis();
 
-            // 1. Envio do pacote HANDSHAKE
+            // 2. Envio do pacote HANDSHAKE
             String handshakeMsg = probPerda + ";" + tamanhoArquivo + ";" + pathDestino;
             byte[] handshakeData = Empacotador.criarPacote(Constantes.TIPO_HANDSHAKE, -1, 0, handshakeMsg.getBytes());
             socket.send(new DatagramPacket(handshakeData, handshakeData.length, enderecoDestino, PORTA_DESTINO));
             System.out.println("HANDSHAKE enviado com sucesso.");
 
-            // 2. Criação da Thread dedicada à receção dos ACKs
+            // 3. Criação da Thread dedicada à receção dos ACKs
             Thread receiverThread = criarThreadReceptora(socket, enderecoDestino, totalPacotes);
             receiverThread.start();
 
-            // 3. Loop principal de envio (FSM do Emissor)
+            // 4. Loop principal de envio (FSM do Emissor)
             while (base < totalPacotes) {
                 synchronized (FSM_LOCK) {
                     boolean enviouNovoPacote = false;
 
                     while (nextSeqNum < base + tamanhoJanela_N && nextSeqNum < totalPacotes) {
-                        enviarPacote(nextSeqNum, socket, enderecoDestino);
+                        enviarNovoPacote(socket, enderecoDestino);
+
                         if (base == nextSeqNum) {
                             iniciarTimer(socket, enderecoDestino);
                         }
+
                         nextSeqNum++;
                         enviouNovoPacote = true;
                     }
@@ -89,7 +97,7 @@ public class Emissor {
 
             receiverThread.join();
 
-            // 4. Envio do pacote FIN
+            // 5. Envio do pacote FIN
             byte[] finData = Empacotador.criarPacote(Constantes.TIPO_FIN, -2, 0, null);
             socket.send(new DatagramPacket(finData, finData.length, enderecoDestino, PORTA_DESTINO));
 
@@ -105,6 +113,7 @@ public class Emissor {
             System.out.printf("Throughput estimado: %.2f Kbps\n", throughputKbps);
             System.out.println("=========================================================");
 
+            fis.close();
             System.exit(0);
 
         } catch (Exception e) {
@@ -142,27 +151,26 @@ public class Emissor {
         });
     }
 
-    private static void carregarArquivoParaPacotes(String caminho) throws Exception {
-        try (FileInputStream fis = new FileInputStream(caminho)) {
-            byte[] buffer = new byte[Constantes.TAMANHO_MAX_DADOS];
-            int bytesLidos;
-            int seqNumAtual = 0;
+    // Método otimizado para ler do disco paulatinamente
+    private static void enviarNovoPacote(DatagramSocket socket, InetAddress endereco) throws Exception {
+        byte[] dadosReais;
+        byte[] bufferLeitura = new byte[Constantes.TAMANHO_MAX_DADOS];
+        int bytesLidos = fis.read(bufferLeitura);
 
-            while ((bytesLidos = fis.read(buffer)) != -1) {
-                byte[] dadosReais = new byte[bytesLidos];
-                System.arraycopy(buffer, 0, dadosReais, 0, bytesLidos);
-                byte[] pacote = Empacotador.criarPacote(Constantes.TIPO_DADOS, seqNumAtual, 0, dadosReais);
-                PACOTES_EM_MEMORIA.add(pacote);
-                seqNumAtual++;
-            }
+        if (bytesLidos != -1) {
+            dadosReais = new byte[bytesLidos];
+            System.arraycopy(bufferLeitura, 0, dadosReais, 0, bytesLidos);
+        } else {
+            dadosReais = new byte[0];
         }
-    }
 
-    private static void enviarPacote(int seqNum, DatagramSocket socket, InetAddress endereco) throws Exception {
-        byte[] dadosPacote = PACOTES_EM_MEMORIA.get(seqNum);
-        DatagramPacket packet = new DatagramPacket(dadosPacote, dadosPacote.length, endereco, PORTA_DESTINO);
+        // Armazena o pacote gerado no buffer circular de forma rotativa usando módulo
+        byte[] pacote = Empacotador.criarPacote(Constantes.TIPO_DADOS, nextSeqNum, 0, dadosReais);
+        bufferCircular[nextSeqNum % tamanhoJanela_N] = pacote;
+
+        DatagramPacket packet = new DatagramPacket(pacote, pacote.length, endereco, PORTA_DESTINO);
         socket.send(packet);
-        System.out.println("Enviado pacote Seq: " + seqNum);
+        System.out.println("Enviado pacote Seq: " + nextSeqNum);
     }
 
     private static void iniciarTimer(DatagramSocket socket, InetAddress endereco) {
@@ -176,7 +184,10 @@ public class Emissor {
                     try {
                         iniciarTimer(socket, endereco);
                         for (int i = base; i < nextSeqNum; i++) {
-                            enviarPacote(i, socket, endereco);
+                            // Extrai os dados do Buffer Circular em vez de os reler do disco
+                            byte[] pacoteRetransmitido = bufferCircular[i % tamanhoJanela_N];
+                            DatagramPacket packet = new DatagramPacket(pacoteRetransmitido, pacoteRetransmitido.length, endereco, PORTA_DESTINO);
+                            socket.send(packet);
                             totalRetransmissoes++;
                         }
                     } catch (Exception e) {
