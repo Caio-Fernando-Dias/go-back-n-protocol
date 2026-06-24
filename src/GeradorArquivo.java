@@ -3,7 +3,7 @@ import java.io.IOException;
 
 public class GeradorArquivo {
     public static void main(String[] args) {
-        String nomeArquivo = "../arquivo_teste.txt";
+        String nomeArquivo = "../data/arquivo_teste.txt";
 
         long tamanhoAlvo = 30 * 1024;
 
