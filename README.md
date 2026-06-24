@@ -148,16 +148,16 @@ Números).</p>
 Pacotes já fora de ordem são descartados pela própria lógica do GBN e não devem ser contabilizados como
 perdas simuladas.</p>
 
-<h3><a>5. Compilação (Corrigir)</a></h3>
+<h3><a>5. Compilação</a></h3>
 
-| Comando                                                                                   | Função                                                               |                     
-|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| `rm *.class`                                                                              | Apaga a última compilação realizada contida na pasta src             |
-| `rm ../arquivo_teste.txt ou rm ../recebido_texte.txt`                                     | Apaga o último arquivo de teste gerado                               |
-| `javac *.java`                                                                            | Compila o programa e o resultado vai para pasta src                 |
-| `java Receptor`                                                                           | Executa o Receptor em um terminal isolado para esperar na porta 5000 |
-| `java GeradorArquivo`                                                                     | Gera o arquivo de trasnferência                                      |
-| `java Emissor <arquivo_origem> <IP_destino>:<path_destino> <tamanho_janela> <prob_perda>` | Executa a transferência de pacote pelo Emissor                       |
+| Comando                                                                                        | Função                                                               |                     
+|------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| `rm *.class`                                                                                   | Apaga a última compilação realizada contida na pasta src             |
+| `rm ../arquivo_teste.txt ou rm ../recebido_teste.txt`                                          | Apaga o último arquivo de teste gerado                               |
+| `javac *.java`                                                                                 | Compila o programa e o resultado vai para pasta src                  |
+| `1) - java GeradorArquivo`                                                                     | Gera o arquivo de trasnferência                                      |
+| `2) - java Receptor`                                                                           | Prepara o Receptor em um terminal isolado para esperar na porta 5000 |
+| `3) - java Emissor <arquivo_origem> <IP_destino>:<path_destino> <tamanho_janela> <prob_perda>` | Executa a transferência de pacotes pelo Emissor                      |
 
 # Alunos
 
