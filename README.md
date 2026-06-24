@@ -150,14 +150,13 @@ perdas simuladas.</p>
 
 <h3><a>5. Compilação</a></h3>
 
-| Comando                                                                                        | Função                                                               |                     
-|------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| `rm *.class`                                                                                   | Apaga a última compilação realizada contida na pasta src             |
-| `rm ../arquivo_teste.txt ou rm ../recebido_teste.txt`                                          | Apaga o último arquivo de teste gerado                               |
-| `javac *.java`                                                                                 | Compila o programa e o resultado vai para pasta src                  |
-| `1) - java GeradorArquivo`                                                                     | Gera o arquivo de trasnferência                                      |
-| `2) - java Receptor`                                                                           | Prepara o Receptor em um terminal isolado para esperar na porta 5000 |
-| `3) - java Emissor <arquivo_origem> <IP_destino>:<path_destino> <tamanho_janela> <prob_perda>` | Executa a transferência de pacotes pelo Emissor                      |
+| Comando                                                                                        | Função                                                                                 |                     
+|------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| `make clean`                                                                                   | Apaga a última compilação realizada contida na pasta build                             |
+| `make`                                                                                         | Executa a compilação do programa e o resultado vai para a pasta build                  |
+| `make gerador`                                                                                 | Cria o pacote que será transmitido pela rede                                           |
+| `make receptor`                                                                                | Inicia o servidor que vai receber os dados, bloqueia o terminal                        |
+| `make emissor ARGS="<arquivo_origem> <IP_destino>:<path_destino> <tamanho_janela> <prob_perda>`| Inicia a transferência, indicando origem e destino, tamanho de janela e prob. de perda |
 
 # Alunos
 
