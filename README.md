@@ -3,13 +3,6 @@
 <img align="center" height="20px" width="60px" alt="" src="https://img.shields.io/badge/Java-version%2017-orange"/> 
 <img align="center" height="20px" width="80px" alt="" src="https://img.shields.io/badge/Intellij%20Idea-000?logo=intellij-idea&style=for-the-badge"/>
 
-[//]: # (<p align="center">)
-
-[//]: # (<img src="imgs/Exemplo de DFS.png"/>)
-
-[//]: # (</p>)
-
-
 <h3><a>1. Contexto e Motivação</a></h3>
 
 <p>A transferência confiável de dados é um dos desafios centrais em redes de computadores. O livro Computer
@@ -90,6 +83,13 @@ sem enviar ACK, forçando retransmissão pelo emissor.
 • Ao final da transferência, exibir estatísticas: total de pacotes recebidos, total de pacotes descartados
 (simulados como perdidos) e taxa de perda efetiva.
 
+<p align="center">
+   <img src="img/img1.png"/>
+</p>
+
+<p>Simulação de perda no terminal do receptor e sem seguida o recebimento de pacotes fora de ordem até chegar o correto. Foi 
+aumentado a probabilidade de perda para garantir no print da execução.</p>
+
 <h5><a>3.3 Módulo emissor</a></h5>
 
 <p>O Emissor é iniciado via linha de comando com os seguintes argumentos obrigatórios:</p>
@@ -121,6 +121,20 @@ temporizador conforme a FSM.
 
 • Exibir progresso em tempo real: número de pacotes enviados, ACKs recebidos, retransmissões e taxa de
 throughput estimada.
+
+<p align="center">
+   <img src="img/img2.png"/>
+</p>
+
+<p>Momento em que o TIMEOUT acontece e a retransmissão acontece garantindo o mecanismo identico ao do Go-Back-N em 
+cenários reais.</p>
+
+<p align="center">
+   <img src="img/img3.png"/>
+</p>
+
+<p>Mesmo código hash que garante que a implementação é confiável e que está acontecendo essa simulação de 
+troca de informações.</p>
 
 <h5><a>3.4 Formato do datagrama</a></h5>
 
