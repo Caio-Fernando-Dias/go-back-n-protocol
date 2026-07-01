@@ -148,7 +148,7 @@ Números).</p>
 Pacotes já fora de ordem são descartados pela própria lógica do GBN e não devem ser contabilizados como
 perdas simuladas.</p>
 
-<h3><a>5. Compilação</a></h3>
+<h3><a>5. Compilação no Linux</a></h3>
 
 | Comando                                                                                        | Função                                                                                 |                     
 |------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
@@ -157,6 +157,16 @@ perdas simuladas.</p>
 | `make gerador`                                                                                 | Cria o pacote que será transmitido pela rede                                           |
 | `make receptor`                                                                                | Inicia o servidor que vai receber os dados, bloqueia o terminal                        |
 | `make emissor ARGS="<arquivo_origem> <IP_destino>:<path_destino> <tamanho_janela> <prob_perda>`| Inicia a transferência, indicando origem e destino, tamanho de janela e prob. de perda |
+
+<h3><a>5. Compilação no Windows (Sem makefile)</a></h3>
+
+| Comando                                                                                        | Função                                                                                 |                     
+|------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| `del ..\build\*.class`                                                                         | Apaga a última compilação realizada contida na pasta build                             |
+| `javac -d ..\build *.java`                                                                     | Executa a compilação do programa e o resultado vai para a pasta build                  |
+| `java -cp ..\build GeradorArquivo`                                                             | Cria o pacote que será transmitido pela rede                                           |
+| `java -cp ..\build Receptor`                                                                   | Inicia o servidor que vai receber os dados, bloqueia o terminal                        |
+| `java -cp ..\build Emissor ..\data\arquivo_teste.txt localhost:..\data\recebido_teste.txt 8 0.15`| Inicia a transferência, indicando origem e destino, tamanho de janela e prob. de perda |
 
 # Alunos
 
